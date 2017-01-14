@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <deque>
 
 using Brick = std::vector<int>;
 
@@ -303,7 +304,7 @@ std::vector<Brick> NewPositions(Brick b1, Brick b2, int length)
 
 void run(std::vector<Brick> startvalues,
          Field<bool> field,
-         std::vector<int> Sequence)
+         std::deque<int> Sequence)
 {
     if (startvalues.size() < 2)
         return;

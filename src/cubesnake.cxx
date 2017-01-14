@@ -14,12 +14,23 @@ int main(int argc, char* argv[])
     int length_sequence;
     file >> length_sequence;
 
-    std::vector<int> Sequence;
+    int sequence_dir;
+    file >> sequence_dir;
+    if (sequence_dir != 1 and sequence_dir != -1)
+    {
+        std::cout << "Sequence must be 1 or -1." <<  sequence_dir << std::endl;
+        return 1;
+    }
+
+    std::deque<int> Sequence;
     int tmp;
     for (int i = 0; i < length_sequence; i++)
     {
         file >> tmp;
-        Sequence.push_back(tmp);
+        if (sequence_dir == 1)
+            Sequence.push_back(tmp);
+        else if (sequence_dir == -1)
+            Sequence.push_front(tmp);
     }
 
     int number_startvalues;
@@ -27,7 +38,7 @@ int main(int argc, char* argv[])
     if (number_startvalues < 2)
     {
         std::cout << "Need at least 2 startvalues :/" << std::endl;
-        return 2;
+        return 1;
     }
     std::vector<std::vector<int>> startvalues;
 
@@ -52,7 +63,7 @@ int main(int argc, char* argv[])
     if (number_nonfree_bricks != 0)
     {
         std::cout << "Non free bricks not implemented yet :/" << std::endl;
-        return 2;
+        return 1;
     }
 
     // check data
@@ -65,7 +76,8 @@ int main(int argc, char* argv[])
     if (field_size_1 != field_size_2)
     {
         std::cout << "Sequence length and field size do not fit together :/" << std::endl;
-        return 3;
+        std::cout << field_size_1 << " != " << field_size_2 << std::endl;
+        return 1;
     }
 
     //
