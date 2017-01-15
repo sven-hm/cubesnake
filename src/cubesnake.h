@@ -6,6 +6,9 @@
 #include <vector>
 #include <deque>
 
+#include <thread>
+#include <mutex>
+
 using Brick = std::vector<int>;
 
 template<typename T>
@@ -301,6 +304,8 @@ std::vector<Brick> NewPositions(Brick b1, Brick b2, int length)
     }
     return newpos;
 };
+        
+std::mutex mtx;
 
 void run(std::vector<Brick> startvalues,
          Field<bool> field,
@@ -325,23 +330,39 @@ void run(std::vector<Brick> startvalues,
     {
         TreeLevel<bool> NewLevel;
 
-        //for (auto it = CurrentLevel.begin(); it != CurrentLevel.end(); it++)
+        std::vector<std::thread> ths;
+
+        std::function<void(int,
+                           std::shared_ptr<TreeNode<bool>>,
+                           TreeLevel<bool>&
+                           )> checknode
+                    = [](int s,
+                         std::shared_ptr<TreeNode<bool>> node,
+                         TreeLevel<bool>& NewLevel)
+                {
+                    std::vector<Brick> newpos =
+                        NewPositions(node->GetFatherPosition(), node->GetPosition(), s);
+
+                    for (auto&& brick : newpos)
+                    {
+                        TreeNode<bool> newnode(brick, node, false, true);
+                        if (newnode.IsValid(false, true))
+                        {
+                            mtx.lock();
+                            NewLevel.push_back(std::make_shared<TreeNode<bool>>(newnode));
+                            mtx.unlock();
+                        }
+                    }
+                    node->DeleteField();
+                };
+
         for (auto&& node : CurrentLevel)
         {
-            std::vector<Brick> newpos =
-                NewPositions(node->GetFatherPosition(), node->GetPosition(), Sequence[i]);
-
-            //for (auto pit = newpos.begin(); pit != newpos.end(); pit++)
-            for (auto&& brick : newpos)
-            {
-                TreeNode<bool> newnode(brick, node, false, true);
-                if (newnode.IsValid(false, true))
-                {
-                    NewLevel.push_back(std::make_shared<TreeNode<bool>>(newnode));
-                }
-            }
-            node->DeleteField();
+            ths.push_back(std::thread(checknode, Sequence[i], node, std::ref(NewLevel)));
         }
+        for (auto&& th : ths)
+            th.join();
+
         if (NewLevel.size() == 0)
         {
             std::cout << "\n... no solution :/\n";
