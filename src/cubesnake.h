@@ -324,14 +324,12 @@ void run(std::vector<Brick> startvalues,
     {
         TreeLevel<bool> NewLevel;
 
-        //for (auto it = CurrentLevel.begin(); it != CurrentLevel.end(); it++)
-        for (auto&& node : CurrentLevel)
+        for (auto& node : CurrentLevel)
         {
             std::vector<Brick> newpos =
                 NewPositions(node->GetFatherPosition(), node->GetPosition(), Sequence[i]);
 
-            //for (auto pit = newpos.begin(); pit != newpos.end(); pit++)
-            for (auto&& brick : newpos)
+            for (auto& brick : newpos)
             {
                 TreeNode<bool> newnode(brick, node, false, true);
                 if (newnode.IsValid(false, true))
