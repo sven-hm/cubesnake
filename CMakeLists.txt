@@ -12,5 +12,7 @@ configure_file(
     )
 include_directories(${CMAKE_BINARY_DIR}/generated/)
 
-target_compile_features(cubesnake PRIVATE cxx_range_for)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread")
+
+#target_compile_features(cubesnake PRIVATE cxx_range_for)
 

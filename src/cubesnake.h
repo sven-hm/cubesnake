@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <thread>
+#include <mutex>
 
 using Brick = std::vector<int>;
 
@@ -303,7 +305,8 @@ std::vector<Brick> NewPositions(Brick b1, Brick b2, int length)
 
 void run(std::vector<Brick> startvalues,
          Field<bool> field,
-         std::vector<int> Sequence)
+         std::vector<int> Sequence,
+         int n_threads)
 {
     if (startvalues.size() < 2)
         return;
@@ -316,44 +319,59 @@ void run(std::vector<Brick> startvalues,
     for (auto startvalue : startvalues)
         nextnode = std::make_shared<TreeNode<bool>> (startvalue, nextnode, false, true);
 
-    TreeLevel<bool> CurrentLevel = {nextnode};
+    // set currentlevel
+    std::shared_ptr<TreeLevel<bool>> CurrentLevelptr(new TreeLevel<bool>({nextnode}));
 
     std::cout << "step\tnumber of candidates" << std::endl;
 
     for (unsigned int i = startvalues.size() - 1; i < Sequence.size(); i++)
     {
-        TreeLevel<bool> NewLevel;
+        std::vector<std::thread> threads;
+        auto NewLevelptr = std::make_shared<TreeLevel<bool>>();
+        std::mutex newlevel_mutex;
 
-        //for (auto it = CurrentLevel.begin(); it != CurrentLevel.end(); it++)
-        for (auto&& node : CurrentLevel)
+        for (int nt = 0; nt < n_threads; nt++)
         {
-            std::vector<Brick> newpos =
-                NewPositions(node->GetFatherPosition(), node->GetPosition(), Sequence[i]);
+            threads.push_back(std::thread(
+                    [NewLevelptr, CurrentLevelptr, nt, n_threads, &Sequence, i, &newlevel_mutex]()
+                    {
+                        for (int j = nt; j < CurrentLevelptr->size(); j = j + n_threads)
+                        {
+                            auto& node = (*CurrentLevelptr)[j];
 
-            //for (auto pit = newpos.begin(); pit != newpos.end(); pit++)
-            for (auto&& brick : newpos)
-            {
-                TreeNode<bool> newnode(brick, node, false, true);
-                if (newnode.IsValid(false, true))
-                {
-                    NewLevel.push_back(std::make_shared<TreeNode<bool>>(newnode));
-                }
-            }
-            node->DeleteField();
+                            std::vector<Brick> newpos =
+                                NewPositions(node->GetFatherPosition(), node->GetPosition(), Sequence[i]);
+
+                            for (auto& brick : newpos)
+                            {
+                                TreeNode<bool> newnode(brick, node, false, true);
+                                if (newnode.IsValid(false, true))
+                                {
+                                    std::unique_lock<std::mutex> lck(newlevel_mutex);
+                                    NewLevelptr->push_back(std::make_shared<TreeNode<bool>>(newnode));
+                                }
+                            }
+                            node->DeleteField();
+                        }
+                    }));
+
         }
-        if (NewLevel.size() == 0)
+        for (auto& t : threads)
+            t.join();
+
+        if (NewLevelptr->size() == 0)
         {
             std::cout << "\n... no solution :/\n";
             break;
         }
-        CurrentLevel = NewLevel;
+        CurrentLevelptr = NewLevelptr;
 
-        std::cout << i + 1 << "\t" << CurrentLevel.size() << "\n";
+        std::cout << i + 1 << "\t" << CurrentLevelptr->size() << "\n";
     }
 
     std::cout << std::endl;
 
-    for (auto it = CurrentLevel.begin(); it != CurrentLevel.end(); it++)
+    for (auto it = CurrentLevelptr->begin(); it != CurrentLevelptr->end(); it++)
     {
         auto ptr = (*it);
 

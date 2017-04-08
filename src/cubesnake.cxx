@@ -2,10 +2,15 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if (argc != 2 and argc != 3)
     {
         std::cout << "Usage: cubesnake infile.txt" << std::endl;
         return 1;
+    }
+    int n_threads = 1;
+    if (argc == 3)
+    {
+        n_threads = atoi(argv[2]);
     }
 
     // collect data
@@ -90,5 +95,5 @@ int main(int argc, char* argv[])
     }
     std::cout << std::endl;
 
-    run(startvalues, field, Sequence);
+    run(startvalues, field, Sequence, n_threads);
 }
