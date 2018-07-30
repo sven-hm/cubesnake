@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(cubesnake)
-set(CUBESNAKE_VERSION 0)
+set(CUBESNAKE_VERSION 1)
 
-add_executable(cubesnake src/cubesnake.cxx)
+add_executable(cubesnake src/main.cxx)
 include_directories(src)
 
 configure_file(
