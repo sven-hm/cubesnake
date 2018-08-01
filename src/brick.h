@@ -3,13 +3,14 @@
 
 #include <memory>
 #include <vector>
+#include <iostream>
 
 namespace cubesnake
 {
     enum Direction
     {
-        AHEAD,
-        CURVE
+        STRAIGHT,
+        TURN
     };
 
     class Chain
@@ -19,6 +20,11 @@ namespace cubesnake
         void Add(Direction dir)
         {
             path.push_back(dir);
+        }
+
+        Direction Get(int index) const
+        {
+            return path[index];
         }
 
         std::vector<Direction> path;
@@ -33,35 +39,17 @@ namespace cubesnake
         }
         std::array<int, 3> position;
 
-        Brick operator+(const Brick& rhs) const
-        {
-            return Brick(std::array<int, 3>({
-                        this->position[0] + rhs.position[0],
-                        this->position[1] + rhs.position[1],
-                        this->position[2] + rhs.position[2]}));
-        }
+        Brick operator+(const Brick& rhs) const;
+        Brick operator-(const Brick& rhs) const;
+        bool operator==(const Brick& rhs) const;
 
-        Brick operator-(const Brick& rhs) const
-        {
-            return Brick(std::array<int, 3>({
-                        this->position[0] - rhs.position[0],
-                        this->position[1] - rhs.position[1],
-                        this->position[2] - rhs.position[2]}));
-        }
+        std::vector<Brick> GetNextBricks(const Brick& before, const Direction dir) const;
 
-        std::vector<Brick> GetNextBricks(const Brick& before, const Direction dir) const
-        {
-            std::vector<Brick> return_vector;
-            if (dir == AHEAD)
-            {
-                return_vector.push_back(*this - before + *this);
-            }
-            else if (dir == CURVE)
-            {
-                // get all four orthogonals
-            }
-            return return_vector;
-        }
+        friend std::ostream& operator<<(std::ostream &out, const Brick& brick);
+    protected:
+        void AddBricks(std::vector<Brick>& new_bricks,
+                       Brick start_brick,
+                       const int fixed_dimension) const;
     };
 }
 

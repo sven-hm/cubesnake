@@ -4,6 +4,7 @@ project(cubesnake)
 set(CUBESNAKE_VERSION 1)
 
 add_executable(cubesnake
+    src/brick.cxx
     src/main.cxx)
 include_directories(src)
 
