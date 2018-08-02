@@ -26,12 +26,12 @@ namespace cubesnake
             int size;
             file >> size;
 
-            area.AddCondition([](const Brick& brick){return brick.position[0] >= 0;});
-            area.AddCondition([](const Brick& brick){return brick.position[0] < 3;});
-            area.AddCondition([](const Brick& brick){return brick.position[1] >= 0;});
-            area.AddCondition([](const Brick& brick){return brick.position[1] < 3;});
-            area.AddCondition([](const Brick& brick){return brick.position[2] >= 0;});
-            area.AddCondition([](const Brick& brick){return brick.position[2] < 3;});
+            area.AddCondition([size](const Brick& brick){return brick.position[0] >= 0;});
+            area.AddCondition([size](const Brick& brick){return brick.position[0] < size;});
+            area.AddCondition([size](const Brick& brick){return brick.position[1] >= 0;});
+            area.AddCondition([size](const Brick& brick){return brick.position[1] < size;});
+            area.AddCondition([size](const Brick& brick){return brick.position[2] >= 0;});
+            area.AddCondition([size](const Brick& brick){return brick.position[2] < size;});
 
             std::string line;
             // first line
@@ -68,8 +68,8 @@ namespace cubesnake
             file >> x >> y >> z;
             auto second_brick = std::make_unique<Brick>(std::array<int, 3>{x, y, z});
 
-            std::cout << *first_brick << std::endl;
-            std::cout << *second_brick << std::endl;
+            //std::cout << *first_brick << std::endl;
+            //std::cout << *second_brick << std::endl;
 
             solution_tree = SolutionTree<Brick> (
                     area, chain,
@@ -78,7 +78,7 @@ namespace cubesnake
             while (file >> x >> y >> z)
             {
                 auto brick =  std::make_unique<Brick>(std::array<int, 3>{x, y, z});
-                std::cout << *brick << std::endl;
+                //std::cout << *brick << std::endl;
                 solution_tree.AddBrick(std::move(brick));
             }
         }

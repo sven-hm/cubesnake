@@ -85,13 +85,10 @@ namespace cubesnake
             }
         }
 
-        void BuildNextLayer()
+        bool BuildNextLayer()
         {
-            std::cout << "---------------------" << std::endl;
-            // 1. iterate on every current node
             for (auto node : current_layer)
             {
-                //std::cout << node->ReadData() << std::endl;
                 // get position of node`s father and node
                 auto new_bricks = node->ReadData().GetNextBricks(
                         node->GetFather()->ReadData(),
@@ -104,37 +101,52 @@ namespace cubesnake
                     // push to next_layer
                     if (area.In(b) && !IntersectWithPrevious(node->GetFather(), b))
                     {
-                        //std::cout << "    " << b << std::endl;
                         next_layer.push_back(std::make_shared<TreeNode<B>>(
                                     node, std::make_unique<B>(b)));
                     }
-                    //else
-                    //    std::cout << "-----" << b << std::endl;
                 }
             }
 
-            std::cout << "layer: " << current_layer_number << ", size: " << current_layer.size() << std::endl;
+            if (next_layer.size() == 0)
+                return false;
+
             next_layer.swap(current_layer);
             next_layer.clear();
             current_layer_number++;
+            return true;
+        }
+
+        void Solve(int number_steps=0)
+        {
+            if (number_steps == 0)
+                while(BuildNextLayer());
+            else
+                for (int ii = 0; ii < number_steps; ii++)
+                    BuildNextLayer();
+
         }
 
         void DumpSolutions()
         {
-            std::cout << "number current nodes: " << current_layer.size() << std::endl;
+            std::cout << "Layer " << current_layer_number << " has " << current_layer.size() << " solutions." << std::endl;
             for (auto node : current_layer)
             {
                 std::cout << "============================" << std::endl;
-                DumpTree(node);
+                std::vector<B> solution;
+                GetBranch(solution, node);
+                for (auto rit = solution.rbegin(); rit < solution.rend(); rit++)
+                {
+                    std::cout << *rit << std::endl;
+                }
             }
         }
 
-        void DumpTree(std::shared_ptr<TreeNode<B>> node)
+        void GetBranch(std::vector<B>& solution, std::shared_ptr<TreeNode<B>> node)
         {
-            std::cout << node->ReadData() << std::endl;
+            solution.push_back(node->ReadData());
             if (!node->IsRoot())
             {
-                DumpTree(node->GetFather());
+                GetBranch(solution, node->GetFather());
             }
         }
 
