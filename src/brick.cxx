@@ -35,8 +35,10 @@ namespace cubesnake
             {
                 for (int j : {-1, 1})
                 {
-                    new_bricks.push_back(start_brick);
-                    new_bricks.back().position[i] += j;
+                    std::array<int, 3> new_brick_position
+                        = start_brick.position;
+                    new_brick_position[i] += j;
+                    new_bricks.push_back(Brick(new_brick_position));
                 }
             }
         }

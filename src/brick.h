@@ -34,10 +34,9 @@ namespace cubesnake
     {
     public:
         Brick(const std::array<int, 3> pos)
-        {
-            position = pos;
-        }
-        std::array<int, 3> position;
+            : position(pos)
+        {}
+        const std::array<int, 3> position;
 
         Brick operator+(const Brick& rhs) const;
         Brick operator-(const Brick& rhs) const;
