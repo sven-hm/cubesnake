@@ -3,7 +3,9 @@
 
 #include <memory>
 #include <cassert>
+#include <fstream>
 
+#include "logger.h"
 #include "area.h"
 #include "brick.h"
 
@@ -49,11 +51,13 @@ namespace cubesnake
                 Area<B>& _area,
                 Chain& _chain,
                 std::unique_ptr<B> first_brick,
-                std::unique_ptr<B> second_brick)
+                std::unique_ptr<B> second_brick,
+                std::shared_ptr<Logger> _logger)
             : area(_area),
               chain(_chain),
               root(std::make_shared<TreeNode<B>>(std::move(first_brick))),
-              current_layer_number(0)
+              current_layer_number(0),
+              logger(std::move(_logger))
         {
             current_layer.push_back(std::make_shared<TreeNode<B>>(root, std::move(second_brick)));
             current_layer_number++;
@@ -87,6 +91,9 @@ namespace cubesnake
 
         bool BuildNextLayer()
         {
+            logger->AddMessage(std::to_string(current_layer_number)
+                    + ", " + std::to_string(current_layer.size()));
+
             for (auto node : current_layer)
             {
                 // get position of node`s father and node
@@ -157,6 +164,7 @@ namespace cubesnake
         std::vector<std::shared_ptr<TreeNode<B>>> next_layer;
         Area<B> area;
         Chain chain;
+        std::shared_ptr<Logger> logger;
     };
 }
 

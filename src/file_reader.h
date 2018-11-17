@@ -2,13 +2,13 @@
 #define __FILE_READER_H__
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <exception>
 
 #include "area.h"
 #include "brick.h"
 #include "tree.h"
+#include "logger.h"
 
 #define DIMENSION (3)
 
@@ -34,6 +34,9 @@ namespace cubesnake
         FileReader(std::string filename)
         {
             std::fstream file(filename, std::ios_base::in);
+
+            auto logger = std::make_shared<Logger>(filename + ".log");
+            logger->AddMessage("");
 
             std::string name;
 
@@ -124,7 +127,8 @@ namespace cubesnake
 
             solution_tree = SolutionTree<Brick<DIMENSION>> (
                     area, chain,
-                    std::move(first_brick), std::move(second_brick));
+                    std::move(first_brick), std::move(second_brick),
+                    logger);
         
             while (file >> x >> y >> z)
             {

@@ -80,7 +80,7 @@ namespace cubesnake
             return return_vector;
         }
 
-        friend std::ostream& operator<<(std::ostream &out, const Brick& brick)
+        friend std::ostream& operator<<(std::ostream& out, const Brick& brick)
         {
             out << "[";
             for (int i = 0; i < Dimension; i++)
