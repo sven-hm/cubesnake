@@ -50,6 +50,15 @@ namespace cubesnake
                        Brick start_brick,
                        const int fixed_dimension) const;
     };
+
+    class BrickDirection : public Brick
+    {
+    public:
+        BrickDirection(const Brick& brick)
+            : Brick(brick)
+        {}
+        int GetDirectionDimension();
+    };
 }
 
 #endif /* __BRiCK_H__ */

@@ -1,4 +1,5 @@
 #include "brick.h"
+#include <cassert>
 
 namespace cubesnake
 {
@@ -49,27 +50,13 @@ namespace cubesnake
     {
         std::vector<Brick> return_vector;
 
-        Brick orientation = *this - before;
+        BrickDirection direction(*this - before);
 
         if (dir == STRAIGHT)
-        {
-            return_vector.push_back(orientation + *this);
-        }
+            return_vector.push_back(direction + *this);
         else if (dir == TURN)
-        {
-            if (orientation.position[0] != 0)
-            {
-                AddBricks(return_vector, *this, 0);
-            }
-            else if (orientation.position[1] != 0)
-            {
-                AddBricks(return_vector, *this, 1);
-            }
-            else if (orientation.position[2] != 0)
-            {
-                AddBricks(return_vector, *this, 2);
-            }
-        }
+            AddBricks(return_vector, *this, direction.GetDirectionDimension());
+
         return return_vector;
     }
 
@@ -79,5 +66,14 @@ namespace cubesnake
             << " " << brick.position[1]
             << " " << brick.position[2] << "]";
         return out;
+    }
+
+
+    int BrickDirection::GetDirectionDimension()
+    {
+        for (int i : {0, 1, 2})
+            if (this->position[i] != 0)
+                return i;
+        assert(false);
     }
 }
