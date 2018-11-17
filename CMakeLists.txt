@@ -25,6 +25,7 @@ add_executable(test_cubesnake
     src/brick.cxx
     test/test_file_reader.cxx
     test/test_area.cxx
-    test/test_brick.cxx)
+    test/test_brick.cxx
+    test/test_tree.cxx)
 
 target_link_libraries(test_cubesnake gtest gtest_main)
