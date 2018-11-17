@@ -1,3 +1,4 @@
+dimension 3
 area cube 3
 chain 27 SSTTTSTTSTTTSTSTTTTSTSTSTSS
 0 0 0

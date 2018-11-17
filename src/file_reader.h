@@ -4,13 +4,30 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <exception>
 
 #include "area.h"
 #include "brick.h"
 #include "tree.h"
 
+#define DIMENSION (3)
+
 namespace cubesnake
 {
+    enum area_type
+    {
+        CUBE,
+        CUBOID,
+        UNKNOWN
+    };
+
+    area_type getAreaType(std::string instr)
+    {
+        if (instr == "cube") return CUBE;
+        else if (instr == "cuboid") return CUBOID;
+        else return UNKNOWN;
+    };
+
     class FileReader
     {
     public:
@@ -19,21 +36,51 @@ namespace cubesnake
             std::fstream file(filename, std::ios_base::in);
 
             std::string name;
+
+            // check dimension
+            file >> name;
+            assert(name == "dimension");
+            int dimension;
+            file >> dimension;
+            assert(dimension == DIMENSION);
+
             // create area
             file >> name;
             assert(name == "area");
+
             file >> name;
-            assert(name == "cube");
+            int size, sizex, sizey, sizez;
+            switch (getAreaType(name))
+            {
+                case CUBE:
+                    file >> sizex;
+                    sizey = sizez = sizex;
+                    break;
 
-            int size;
-            file >> size;
+                case CUBOID:
+                    file >> sizex, sizey, sizez;
+                    break;
 
-            area.AddCondition([size](const Brick& brick){return brick.position[0] >= 0;});
-            area.AddCondition([size](const Brick& brick){return brick.position[0] < size;});
-            area.AddCondition([size](const Brick& brick){return brick.position[1] >= 0;});
-            area.AddCondition([size](const Brick& brick){return brick.position[1] < size;});
-            area.AddCondition([size](const Brick& brick){return brick.position[2] >= 0;});
-            area.AddCondition([size](const Brick& brick){return brick.position[2] < size;});
+                case UNKNOWN:
+                default:
+                    throw std::runtime_error("file format error :/");
+                    break;
+            }
+
+            size = sizex * sizey * sizez;
+
+            area.AddCondition([]
+                    (const Brick<DIMENSION>& brick){return brick.position[0] >= 0;});
+            area.AddCondition([sizex]
+                    (const Brick<DIMENSION>& brick){return brick.position[0] < sizex;});
+            area.AddCondition([]
+                    (const Brick<DIMENSION>& brick){return brick.position[1] >= 0;});
+            area.AddCondition([sizey]
+                    (const Brick<DIMENSION>& brick){return brick.position[1] < sizey;});
+            area.AddCondition([]
+                    (const Brick<DIMENSION>& brick){return brick.position[2] >= 0;});
+            area.AddCondition([sizez]
+                    (const Brick<DIMENSION>& brick){return brick.position[2] < sizez;});
 
             std::string line;
             // first line
@@ -42,8 +89,10 @@ namespace cubesnake
 
             // second line
             file >> name;
+            assert(name == "chain");
             int length;
             file >> length;
+            assert(length == size);
 
             std::string chainstring;
             file >> chainstring;
@@ -66,30 +115,30 @@ namespace cubesnake
 
             int x, y, z;
             file >> x >> y >> z;
-            auto first_brick =  std::make_unique<Brick>(std::array<int, 3>{x, y, z});
+            auto first_brick =  std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
             file >> x >> y >> z;
-            auto second_brick = std::make_unique<Brick>(std::array<int, 3>{x, y, z});
+            auto second_brick = std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
 
             //std::cout << *first_brick << std::endl;
             //std::cout << *second_brick << std::endl;
 
-            solution_tree = SolutionTree<Brick> (
+            solution_tree = SolutionTree<Brick<DIMENSION>> (
                     area, chain,
                     std::move(first_brick), std::move(second_brick));
         
             while (file >> x >> y >> z)
             {
-                auto brick =  std::make_unique<Brick>(std::array<int, 3>{x, y, z});
+                auto brick =  std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
                 //std::cout << *brick << std::endl;
                 solution_tree.AddBrick(std::move(brick));
             }
         }
 
     public:
-        SolutionTree<Brick> solution_tree;
+        SolutionTree<Brick<DIMENSION>> solution_tree;
 
     private:
-        Area<Brick> area;
+        Area<Brick<DIMENSION>> area;
         Chain chain;
     };
 }
