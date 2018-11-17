@@ -2,17 +2,19 @@
 #define __FILE_READER_H__
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include "area.h"
 #include "brick.h"
+#include "tree.h"
 
 namespace cubesnake
 {
     class FileReader
     {
     public:
-        FileReader(char* filename)
+        FileReader(std::string filename)
         {
             std::fstream file(filename, std::ios_base::in);
 

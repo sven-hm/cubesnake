@@ -42,7 +42,8 @@ namespace cubesnake
         }
     }
 
-    std::vector<Brick> Brick::GetNextBricks(const Brick& before, const Direction dir) const
+    std::vector<Brick> Brick::GetNextBricks(
+            const Brick& before, const Direction dir) const
     {
         std::vector<Brick> return_vector;
 
@@ -75,6 +76,6 @@ namespace cubesnake
         out << "[" << brick.position[0]
             << " " << brick.position[1]
             << " " << brick.position[2] << "]";
-        return out;  
+        return out;
     }
 }

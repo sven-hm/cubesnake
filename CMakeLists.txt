@@ -18,3 +18,13 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++17 -pthread -g")
 
 #target_compile_features(cubesnake PRIVATE cxx_range_for)
 
+enable_testing()
+find_package(GTest REQUIRED)
+
+add_executable(test_cubesnake
+    src/brick.cxx
+    test/test_file_reader.cxx
+    test/test_area.cxx
+    test/test_brick.cxx)
+
+target_link_libraries(test_cubesnake gtest gtest_main)
