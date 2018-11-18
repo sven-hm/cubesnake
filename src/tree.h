@@ -4,6 +4,8 @@
 #include <memory>
 #include <cassert>
 #include <fstream>
+#include <thread>
+#include <mutex>
 
 #include "logger.h"
 #include "area.h"
@@ -52,12 +54,14 @@ namespace cubesnake
                 Chain& _chain,
                 std::unique_ptr<B> first_brick,
                 std::unique_ptr<B> second_brick,
-                std::shared_ptr<Logger> _logger)
+                std::shared_ptr<Logger> _logger,
+                int _number_of_threads=1)
             : area(_area),
               chain(_chain),
               root(std::make_shared<TreeNode<B>>(std::move(first_brick))),
               current_layer_number(0),
-              logger(std::move(_logger))
+              logger(std::move(_logger)),
+              number_of_threads(_number_of_threads)
         {
             current_layer.push_back(std::make_shared<TreeNode<B>>(root, std::move(second_brick)));
             current_layer_number++;
@@ -94,25 +98,41 @@ namespace cubesnake
             logger->AddMessage(std::to_string(current_layer_number)
                     + ", " + std::to_string(current_layer.size()));
 
-            for (auto node : current_layer)
-            {
-                // get position of node`s father and node
-                auto new_bricks = node->ReadData().GetNextBricks(
-                        node->GetFather()->ReadData(),
-                        chain.Get(current_layer_number));
+            std::vector<std::thread> workingthreads;
 
-                for (auto b : new_bricks)
+            std::mutex next_layer_mutex;
+            for (int threadnr = 0; threadnr < number_of_threads; threadnr++)
+            {
+                std::thread workingthread([&, threadnr]()
                 {
-                    // check if b fits in area
-                    // check if b does not intersect with previous bricks
-                    // push to next_layer
-                    if (area.In(b) && !IntersectWithPrevious(node->GetFather(), b))
+                    for (int ii = threadnr; ii < this->current_layer.size();
+                            ii = ii + number_of_threads)
                     {
-                        next_layer.push_back(std::make_shared<TreeNode<B>>(
-                                    node, std::make_unique<B>(b)));
+                        auto node = this->current_layer[ii];
+                        // get position of node`s father and node
+                        auto new_bricks = node->ReadData().GetNextBricks(
+                                node->GetFather()->ReadData(),
+                                chain.Get(this->current_layer_number));
+
+                        for (auto b : new_bricks)
+                        {
+                            // check if b fits in area
+                            // check if b does not intersect with previous bricks
+                            // push to next_layer
+                            if (area.In(b) && !IntersectWithPrevious(node->GetFather(), b))
+                            {
+                                std::lock_guard<std::mutex> guard(next_layer_mutex);
+                                this->next_layer.push_back(std::make_shared<TreeNode<B>>(
+                                            node, std::make_unique<B>(b)));
+                            }
+                        }
                     }
-                }
+                });
+                workingthreads.push_back(std::move(workingthread));
             }
+
+            for (auto& workingthread : workingthreads)
+                workingthread.join();
 
             if (next_layer.size() == 0)
                 return false;
@@ -165,6 +185,7 @@ namespace cubesnake
         Area<B> area;
         Chain chain;
         std::shared_ptr<Logger> logger;
+        int number_of_threads;
     };
 }
 

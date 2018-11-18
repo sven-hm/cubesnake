@@ -31,7 +31,7 @@ namespace cubesnake
     class FileReader
     {
     public:
-        FileReader(std::string filename)
+        FileReader(std::string filename, int number_of_threads)
         {
             std::fstream file(filename, std::ios_base::in);
 
@@ -128,7 +128,7 @@ namespace cubesnake
             solution_tree = SolutionTree<Brick<DIMENSION>> (
                     area, chain,
                     std::move(first_brick), std::move(second_brick),
-                    logger);
+                    logger, number_of_threads);
         
             while (file >> x >> y >> z)
             {
