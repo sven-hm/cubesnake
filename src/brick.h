@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 namespace cubesnake
 {
@@ -40,13 +41,18 @@ namespace cubesnake
         Brick(const std::array<int, Dimension> pos)
             : position(pos)
         {}
-        const std::array<int, Dimension> position;
+
+        int GetPosition(int dim) const
+        {
+            assert(dim >= 0 && dim < Dimension);
+            return position[dim];
+        }
 
         Brick operator+(const Brick& rhs) const
         {
             std::array<int, Dimension> new_pos;
             for (int i = 0; i < Dimension; i++)
-                new_pos[i] = this->position[i] + rhs.position[i];
+                new_pos[i] = this->GetPosition(i) + rhs.GetPosition(i);
             return Brick(new_pos);
         }
 
@@ -54,14 +60,14 @@ namespace cubesnake
         {
             std::array<int, Dimension> new_pos;
             for (int i = 0; i < Dimension; i++)
-                new_pos[i] = this->position[i] - rhs.position[i];
+                new_pos[i] = this->GetPosition(i) - rhs.GetPosition(i);
             return Brick(new_pos);
         }
 
         bool operator==(const Brick& rhs) const
         {
             for (int i = 0; i < Dimension; i++)
-                if (this->position[i] != rhs.position[i])
+                if (this->GetPosition(i) != rhs.GetPosition(i))
                     return false;
             return true;
         }
@@ -84,11 +90,11 @@ namespace cubesnake
         {
             out << "[";
             for (int i = 0; i < Dimension; i++)
-                out << " " << brick.position[i];
+                out << " " << brick.GetPosition(i);
             out << " ]";
             return out;
         }
-    protected:
+    private:
         void AddBricks(std::vector<Brick>& new_bricks,
                        Brick start_brick,
                        const int fixed_Dimension) const
@@ -97,12 +103,14 @@ namespace cubesnake
                 if (i != fixed_Dimension)
                     for (int j : {-1, 1})
                     {
-                        std::array<int, Dimension> new_brick_position
-                            = start_brick.position;
+                        std::array<int, Dimension> new_brick_position;
+                        for (int k = 0; k < Dimension; k++)
+                            new_brick_position[k] = start_brick.GetPosition(k);
                         new_brick_position[i] += j;
                         new_bricks.push_back(Brick(new_brick_position));
                     }
         }
+        const std::array<int, Dimension> position;
     };
 
     template<int Dimension>
@@ -115,7 +123,7 @@ namespace cubesnake
         int GetDirectionDimension()
         {
             for (int i = 0; i < Dimension; i++)
-                if (this->position[i] != 0)
+                if (this->GetPosition(i) != 0)
                     return i;
         }
     };

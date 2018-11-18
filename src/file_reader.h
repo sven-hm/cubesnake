@@ -73,17 +73,17 @@ namespace cubesnake
             size = sizex * sizey * sizez;
 
             area.AddCondition([]
-                    (const Brick<DIMENSION>& brick){return brick.position[0] >= 0;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(0) >= 0;});
             area.AddCondition([sizex]
-                    (const Brick<DIMENSION>& brick){return brick.position[0] < sizex;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(0) < sizex;});
             area.AddCondition([]
-                    (const Brick<DIMENSION>& brick){return brick.position[1] >= 0;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(1) >= 0;});
             area.AddCondition([sizey]
-                    (const Brick<DIMENSION>& brick){return brick.position[1] < sizey;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(1) < sizey;});
             area.AddCondition([]
-                    (const Brick<DIMENSION>& brick){return brick.position[2] >= 0;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(2) >= 0;});
             area.AddCondition([sizez]
-                    (const Brick<DIMENSION>& brick){return brick.position[2] < sizez;});
+                    (const Brick<DIMENSION>& brick){return brick.GetPosition(2) < sizez;});
 
             std::string line;
             // first line

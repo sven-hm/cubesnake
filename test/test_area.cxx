@@ -11,8 +11,8 @@ TEST(create, area_1)
 
     int size = 2;
 
-    area.AddCondition([size](const Brick<1>& brick){return brick.position[0] >= 0;});
-    area.AddCondition([size](const Brick<1>& brick){return brick.position[0] < size;});
+    area.AddCondition([size](const Brick<1>& brick){return brick.GetPosition(0) >= 0;});
+    area.AddCondition([size](const Brick<1>& brick){return brick.GetPosition(0) < size;});
 
     Brick<1> b1({1});
     Brick<1> b2({4});
@@ -27,12 +27,12 @@ TEST(create, area_3)
 
     int size = 4;
 
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[0] >= 0;});
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[0] < size;});
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[1] >= 0;});
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[1] < size;});
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[2] >= 0;});
-    area.AddCondition([size](const Brick<3>& brick){return brick.position[2] < size;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(0) >= 0;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(0) < size;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(1) >= 0;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(1) < size;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(2) >= 0;});
+    area.AddCondition([size](const Brick<3>& brick){return brick.GetPosition(2) < size;});
 
     Brick<3> b1({1,2,3});
     Brick<3> b2({4,5,6});
@@ -51,16 +51,16 @@ TEST(create, area_5)
 
     int size = 4;
 
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[0] >= 0;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[0] < size;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[1] >= 0;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[1] < size;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[2] >= 0;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[2] < size;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[3] >= 0;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[3] < size;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[4] >= 0;});
-    area.AddCondition([size](const Brick<5>& brick){return brick.position[4] < size;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(0) >= 0;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(0) < size;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(1) >= 0;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(1) < size;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(2) >= 0;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(2) < size;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(3) >= 0;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(3) < size;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(4) >= 0;});
+    area.AddCondition([size](const Brick<5>& brick){return brick.GetPosition(4) < size;});
 
     Brick<5> b1({1,2,3,3,2});
     Brick<5> b2({4,5,6,3,6});
