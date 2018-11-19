@@ -44,10 +44,10 @@ namespace cubesnake
         using Position = std::array<int, Dimension>;
 
     public:
-        static PositionSet<Dimension>* GetInstance()
+        static std::shared_ptr<PositionSet<Dimension>> GetInstance()
         {
             if (instance == nullptr)
-                instance = new PositionSet<Dimension>;
+                instance = std::make_shared<PositionSet<Dimension>>();
             return instance;
         }
 
@@ -63,12 +63,12 @@ namespace cubesnake
         }
 
     private:
-        static PositionSet<Dimension>* instance;
+        static std::shared_ptr<PositionSet<Dimension>> instance;
         std::vector<std::shared_ptr<const Position>> positions;
     };
 
     template<int Dimension>
-    PositionSet<Dimension>* PositionSet<Dimension>::instance = nullptr;
+    std::shared_ptr<PositionSet<Dimension>> PositionSet<Dimension>::instance = nullptr;
 
     template<int Dimension>
     class Brick
