@@ -4,8 +4,6 @@
 #include <memory>
 #include <vector>
 
-#include "brick.h"
-
 namespace cubesnake
 {
     template<typename B>

@@ -93,6 +93,34 @@ namespace cubesnake
             }
         }
 
+        bool SplitsArea(std::shared_ptr<TreeNode<B>> node, B& brick)
+        {
+            // check if brick and node + node's fathers split the area
+            // by counting the connected empty fields
+            // if this number == area.size() - current_layer_number -> no
+            // if this number <  area.size() - current_layer_number -> yes
+
+            std::vector<B> chain_complement;
+            auto fill_complement = [&](B& b){
+                auto neighbours = b.ReadData().GetNeighbours();
+                for (auto& nb : neighbours)
+                {
+                    if (   nb != brick
+                        && area.In(nb)
+                        && !IntersectWithPrevious(node, nb)
+                        && true)
+                    {
+                        chain_complement.push_back(nb);
+                    }
+                }
+                return;
+            };
+
+            fill_complement();
+            return (chain_complement.size() == area.size() - current_layer_number()) ?
+                false : true;
+        }
+
         bool BuildNextLayer()
         {
             logger->AddMessage(std::to_string(current_layer_number)
@@ -116,10 +144,13 @@ namespace cubesnake
 
                         for (auto b : new_bricks)
                         {
-                            // check if b fits in area
-                            // check if b does not intersect with previous bricks
+                            // 1. check if b fits in area
+                            // 2. check if b does not intersect with previous bricks
+                            // 3. check if area is splitted
                             // push to next_layer
-                            if (area.In(b) && !IntersectWithPrevious(node->GetFather(), b))
+                            if (   area.In(b)
+                                && !IntersectWithPrevious(node->GetFather(), b)
+                                && !SplitsArea(node, b))
                             {
                                 std::lock_guard<std::mutex> guard(next_layer_mutex);
                                 this->next_layer.push_back(std::make_shared<TreeNode<B>>(

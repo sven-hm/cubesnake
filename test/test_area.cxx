@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <area.h>
+#include <brick.h>
 
 using namespace cubesnake;
 

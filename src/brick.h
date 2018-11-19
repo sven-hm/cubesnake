@@ -29,6 +29,12 @@ namespace cubesnake
             return path[index];
         }
 
+        int size()
+        {
+            return path.size();
+        }
+
+    private:
         std::vector<Direction> path;
     };
 
@@ -121,6 +127,13 @@ namespace cubesnake
             else if (dir == TURN)
                 AddBricks(return_vector, *this, direction.GetDirectionDimension());
 
+            return return_vector;
+        }
+
+        std::vector<Brick> GetNeighbours() const
+        {
+            std::vector<Brick> return_vector;
+            AddBricks(return_vector, *this, -1);
             return return_vector;
         }
 
