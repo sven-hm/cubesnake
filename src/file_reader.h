@@ -1,6 +1,7 @@
 #ifndef __FILE_READER_H__
 #define __FILE_READER_H__
 
+#include <sstream>
 #include <iostream>
 #include <string>
 #include <exception>
@@ -36,7 +37,9 @@ namespace cubesnake
             std::fstream file(filename, std::ios_base::in);
 
             auto logger = std::make_shared<Logger>(filename + ".log");
-            logger->AddMessage("");
+            logger->AddMessage("============================================");
+            logger->AddMessage("============================================");
+            logger->AddMessage("cubesnake on " + filename);
 
             std::string name;
 
@@ -99,6 +102,7 @@ namespace cubesnake
 
             std::string chainstring;
             file >> chainstring;
+            logger->AddMessage("chain: " + chainstring);
             assert(length == chainstring.length());
             for(char& cc : chainstring)
             {
@@ -116,14 +120,18 @@ namespace cubesnake
                 }
             }
 
+            logger->AddMessage("start with:");
             int x, y, z;
             file >> x >> y >> z;
+            logger->AddMessage("[ " + std::to_string(x) +
+                               " "  + std::to_string(y) +
+                               " "  + std::to_string(z) + " ]");
             auto first_brick =  std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
             file >> x >> y >> z;
+            logger->AddMessage("[ " + std::to_string(x) +
+                               " "  + std::to_string(y) +
+                               " "  + std::to_string(z) + " ]");
             auto second_brick = std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
-
-            //std::cout << *first_brick << std::endl;
-            //std::cout << *second_brick << std::endl;
 
             solution_tree = SolutionTree<Brick<DIMENSION>> (
                     area, chain,
@@ -132,10 +140,13 @@ namespace cubesnake
         
             while (file >> x >> y >> z)
             {
+                logger->AddMessage("[ " + std::to_string(x) +
+                                   " "  + std::to_string(y) +
+                                   " "  + std::to_string(z) + " ]");
                 auto brick =  std::make_unique<Brick<DIMENSION>>(std::array<int, DIMENSION>{x, y, z});
-                //std::cout << *brick << std::endl;
                 solution_tree.AddBrick(std::move(brick));
             }
+            logger->AddMessage("=========================");
         }
 
     public:

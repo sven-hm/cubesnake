@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <cassert>
+#include <iostream>
+#include <sstream>
 #include <fstream>
 #include <thread>
 #include <mutex>
@@ -132,6 +134,8 @@ namespace cubesnake
 
         void Solve(int number_steps=0)
         {
+            logger->AddMessage("layer, layer_width");
+
             if (number_steps == 0)
                 while(BuildNextLayer());
             else
@@ -142,15 +146,18 @@ namespace cubesnake
 
         void DumpSolutions()
         {
-            std::cout << "Layer " << current_layer_number << " has " << current_layer.size() << " solutions." << std::endl;
+            logger->AddMessage("Layer " + std::to_string(current_layer_number)
+                    + " has " + std::to_string(current_layer.size()) + " solutions.");
             for (auto node : current_layer)
             {
-                std::cout << "============================" << std::endl;
+                logger->AddMessage("============");
                 std::vector<B> solution;
                 GetBranch(solution, node);
                 for (auto rit = solution.rbegin(); rit < solution.rend(); rit++)
                 {
-                    std::cout << *rit << std::endl;
+                    std::ostringstream oss;
+                    oss << *rit;
+                    logger->AddMessage(oss.str());
                 }
             }
         }
