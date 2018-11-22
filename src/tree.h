@@ -77,50 +77,6 @@ namespace cubesnake
             current_layer_number++;
         }
 
-        bool IntersectWithPrevious(std::shared_ptr<TreeNode<B>> father, B& brick)
-        {
-            if (brick == father->ReadData())
-            {
-                return true;
-            }
-            else if (father->IsRoot())
-            {
-                return false;
-            }
-            else
-            {
-                return IntersectWithPrevious(father->GetFather(), brick);
-            }
-        }
-
-        bool SplitsArea(std::shared_ptr<TreeNode<B>> node, B& brick)
-        {
-            // check if brick and node + node's fathers split the area
-            // by counting the connected empty fields
-            // if this number == area.size() - current_layer_number -> no
-            // if this number <  area.size() - current_layer_number -> yes
-
-            std::vector<B> chain_complement;
-            auto fill_complement = [&](B& b){
-                auto neighbours = b.ReadData().GetNeighbours();
-                for (auto& nb : neighbours)
-                {
-                    if (   nb != brick
-                        && area.In(nb)
-                        && !IntersectWithPrevious(node, nb)
-                        && true)
-                    {
-                        chain_complement.push_back(nb);
-                    }
-                }
-                return;
-            };
-
-            fill_complement();
-            return (chain_complement.size() == area.size() - current_layer_number()) ?
-                false : true;
-        }
-
         bool BuildNextLayer()
         {
             logger->AddMessage(std::to_string(current_layer_number)
@@ -199,6 +155,59 @@ namespace cubesnake
             }
         }
 
+    private:
+        bool IntersectWithPrevious(std::shared_ptr<TreeNode<B>> father, B& brick)
+        {
+            if (brick == father->ReadData())
+            {
+                return true;
+            }
+            else if (father->IsRoot())
+            {
+                return false;
+            }
+            else
+            {
+                return IntersectWithPrevious(father->GetFather(), brick);
+            }
+        }
+
+        bool SplitsArea(std::shared_ptr<TreeNode<B>> node, B& brick)
+        {
+            // check if brick and node + node's fathers split the area
+            // by counting the connected empty fields
+
+            std::vector<B> chain_complement;
+            std::function<void(B&)> fill_complement = [&](B& b){
+                auto neighbours = b.GetNeighbours();
+                for (auto& nb : neighbours)
+                {
+                    if (   !(nb == brick)
+                        && area.In(nb)
+                        && !IntersectWithPrevious(node, nb))
+                    {
+                        bool in = false;
+                        for (auto& el : chain_complement)
+                            if (el == nb)
+                            {
+                                in = true;
+                                break;
+                            }
+                        if (!in)
+                        {
+                            chain_complement.push_back(nb);
+                            fill_complement(nb);
+                        }
+                    }
+                }
+                return;
+            };
+
+            fill_complement(brick);
+            return (chain_complement.size() == chain.size() - current_layer_number - 2) ?
+                false : true;
+        }
+
         void GetBranch(std::vector<B>& solution, std::shared_ptr<TreeNode<B>> node)
         {
             solution.push_back(node->ReadData());
@@ -208,7 +217,6 @@ namespace cubesnake
             }
         }
 
-    private:
         std::shared_ptr<TreeNode<B>> root;
         std::vector<std::shared_ptr<TreeNode<B>>> current_layer;
         int current_layer_number;
